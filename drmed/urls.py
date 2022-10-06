@@ -20,6 +20,7 @@ from medapp import views
 urlpatterns = [
     path('admin/', admin.site.urls), 
     path('', views.home, name="home"),
+    path('login/', views.login), 
     path('elderly/register/', views.add_new, name="add_new"),
     # step 1
     path('elderly/register/1/', views.elder_register, name="elder_register"),

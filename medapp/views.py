@@ -169,3 +169,6 @@ def save_elder_info(request):
         return render(request, 'layout.html')
     else:
         return render(request, 'layout.html')
+
+def login(request):
+    return render(request, 'login.html')
