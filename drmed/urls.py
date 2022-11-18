@@ -16,11 +16,22 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from medapp import views
+from django.conf import settings  
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls), 
     path('', views.home, name="home"),
-    path('login/', views.login), 
+    # sign in
+    path('login_form/', views.login_form), 
+    path('login_form/login/', views.login), 
+    # sign out
+    path('logout/', views.logout), 
+    # sign up
+    path('signup/', views.signup), 
+    # read / show elder's info
+    path('elderinfo/', views.view_elder_info), 
+    path('signup/signup_form/', views.signup_form), 
     path('elderly/register/', views.add_new, name="add_new"),
     # step 1
     path('elderly/register/1/', views.elder_register, name="elder_register"),
@@ -32,3 +43,6 @@ urlpatterns = [
     path('elderly/register/5/', views.elder_register5, name="elder_register5"), 
     path('elderly/register/summary/', views.save_elder_info, name="save_elder_info"), 
 ]
+
+if settings.DEBUG:  
+    urlpatterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)

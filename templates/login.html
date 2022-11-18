@@ -1,22 +1,25 @@
 {% extends 'layout.html' %}
 
 {% block content %}
+    {% for message in messages %}
+        <div class="alert alert-danger m-auto mt-5 w-75 text-center">{{message}}</div>
+    {% endfor %}
 
-    <form action="" method="post">
+    <form action="login/" method="post">
         {% csrf_token %}
-        <div class="card w-75 m-auto mt-5">
-            <div class="modal-body mx-3">
-                <h2 class="text-center m-3 mb-3">Log In</h2>
+        <div class="card w-75 m-auto mt-5 shadow rounded-4">
+            <div class="modal-body mx-4">
+                <h2 class="text-center m-3 mb-3">เข้าสู่ระบบ</h2>
                 <div class="mb-3">
-                    <label for="" class="form-label">Email</label>
-                    <input type="email" class="form-control" placeholder="example@email.com" name="login_email" value="">
+                    <label for="" class="form-label">อีเมล</label>
+                    <input type="email" class="form-control" placeholder="Example@email.com" name="login_email" value="">
                 </div>
                 <div class="mb-3">
-                    <label for="" class="form-label">Password</label>
-                    <input type="password" class="form-control" name="login_password" value="">
+                    <label for="" class="form-label">รหัสผ่าน</label>
+                    <input type="password" class="form-control" placeholder="Password@123" name="login_password" value="">
                 </div>
                 <div class="mb-3">
-                    <input type="submit" value="LOGIN" class="btn btn-primary w-100">
+                    <input type="submit" value="เข้าสู่ระบบ" class="btn btn-primary w-100">
                 </div>
             </div>
         </div>

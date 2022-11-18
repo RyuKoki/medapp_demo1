@@ -1,0 +1,41 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+
+    {% for message in messages %}
+        <div class="alert alert-danger m-auto mt-5 w-75 text-center">{{message}}</div>
+    {% endfor %}
+
+    <form action="signup_form/" method="post">
+        {% csrf_token %}
+        <div class="card w-75 m-auto mt-5 mb-5 shadow rounded-4">
+            <h2 class="text-center m-5 mb-3">ลงทะเบียน</h2>
+            <div class="modal-body mx-4">
+                <div class="row align-items-start">
+                    <div class="col mb-3">
+                        <label for="" class="form-label">ชื่อ</label>
+                        <input type="text" class="form-control" name="firstname" placeholder="เช่น สุภิญญา" name="care_name">
+                    </div>
+                    <div class="col mb-3">
+                        <label for="" class="form-label">นามสกุล</label>
+                        <input type="text" class="form-control" name="surename" placeholder="เช่น โภค" name="care_surename">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="" class="form-label">อีเมล</label>
+                    <input type="email" class="form-control" name="e_mail" placeholder="Example@email.com">
+                </div>
+                <div class="mb-3">
+                    <label for="" class="form-label">รหัสผ่าน</label>
+                    <input type="password" class="form-control" name="password" placeholder="Password@123">
+                </div>
+                <div class="mb-3">
+                    <label for="" class="form-label">ยืนยันรหัสผ่าน</label>
+                    <input type="password" class="form-control" name="repassword" placeholder="Password@123">
+                </div>
+                <input type="submit" value="ลงทะเบียน" class="btn btn-primary w-100 mb-3">
+            </div>
+        </div>
+    </form>
+
+{% endblock %}

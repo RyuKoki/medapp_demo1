@@ -76,18 +76,18 @@ WSGI_APPLICATION = 'drmed.wsgi.application'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
     # 'default': {
-    #     'ENGINE': 'django.db.backends.mysql',
-    #     'NAME': 'django_drmed', 
-    #     'USER': 'root', 
-    #     'PASSWORD': 'xxx', 
-    #     'HOST': '127.0.0.1', 
-    #     'PORT': '3306'
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': BASE_DIR / 'db.sqlite3',
     # }
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'medtest03', 
+        'USER': 'root', 
+        'PASSWORD': 'xxx', 
+        'HOST': '127.0.0.1', 
+        'PORT': '3306'
+    }
 }
 
 
@@ -126,6 +126,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = 'static/'
+
+# image path to stores
+MEDIA_URL = '/file_upload/'
+MEDIA_ROOT = os.path.join(BASE_DIR,'file_upload')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field

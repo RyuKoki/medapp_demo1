@@ -1,0 +1,79 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    <div class="m-auto my-5">
+        <h1 class="text-center"><strong>ข้อมูลส่วนตัว</strong></h1>
+        <div class="my-3">
+            <h3>ข้อมูลเบื้องต้น</h3>
+            <div class="row h5 ms-5">
+                <div class="col">
+                    <p><strong>ชื่อ : </strong>{{elder_info.first_name}}</p>
+                </div>
+                <div class="col">
+                    <p><strong>นามสกุล : </strong>{{elder_info.sure_name}}</p>
+                </div>
+            </div>
+            <div class="row h5 ms-5">
+                <div class="col">
+                    <p><strong>วัน/เดือน/ปีเกิด : </strong>{{elder_info.birthday|date:"d/m/Y"}}</p>
+                </div>
+                <div class="col">
+                    <p><strong>เลขประจำตัวบัตรโรงพยาบาล : </strong>{{elder_info.hospital_number}}</p>
+                </div>
+            </div>
+            <div class="row h5 ms-5">
+                <div class="col">
+                    <p><strong>โรงพยาบาลที่รักษา : </strong>{{elder_info.hospital_name}}</p>
+                </div>
+                <div class="col">
+                    <p><strong>เบอร์โทรโรงพยาบาล : </strong>{{elder_info.hospital_phone}}</p>
+                </div>
+            </div>
+            <div class="row h5 ms-5">
+                <div class="col">
+                    <p><strong>โรคประจำตัว</strong></p>
+                    <ul class="ms-5">
+                        {% for di in elder_disease %}
+                            <li>{{di}}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class="col">
+                    <p><strong>ปัญหาสภาพทางร่างกาย</strong></p>
+                    <ul class="ms-5">
+                        {% for phy in elder_physical %}
+                            <li>{{phy}}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class="col">
+                    <p><strong>ความทรงจำ</strong></p>
+                    <!-- <p class="ms-5">{{elder_memory}}</p> -->
+                    {% if elder_memory == 'remember' %}
+                        <p class="ms-5"><strong class="text-danger">สามารถจำ</strong>จำนวนเม็ดยาได้</p>
+                    {% else %}
+                        <p class="ms-5"><strong class="text-danger">ไม่สามารถ</strong>จำจำนวนเม็ดยาได้</p>
+                    {% endif %}
+                </div>
+            </div>
+            <hr>
+            <h3>ข้อมูลติดต่อกรณีฉุกเฉิน</h3>
+            <div class="row h5 ms-5">
+                <div class="col">
+                    <p><strong>ชื่อผู้ติดต่อฉุกเฉิน : </strong>{{elder_info.relative_firstname}}</p>
+                </div>
+                <div class="col">
+                    <p><strong>นามสกุลผู้ติดต่อฉุกเฉิน : </strong>{{elder_info.relative_surename}}</p>
+                </div>
+            </div>
+            <div class="row h5 ms-5">
+                <div class="col">
+                    <p><strong>ความสัมพันธ์ : </strong>{{elder_info.relative_relation}}</p>
+                </div>
+                <div class="col">
+                    <p><strong>เบอร์โทรติดต่อฉุกเฉิน : </strong>{{elder_info.relative_phone}}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
