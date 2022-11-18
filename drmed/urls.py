@@ -42,6 +42,11 @@ urlpatterns = [
     # step 3
     path('elderly/register/5/', views.elder_register5, name="elder_register5"), 
     path('elderly/register/summary/', views.save_elder_info, name="save_elder_info"), 
+    # forget password
+    path('reset_password/', views.forget_password, name="forget_password"), 
+    path('login/reset/', views.send_reset_pwd, name="send_reset_pwd"), 
+    path('setting_password/', views.new_password, name="new_password"), 
+    path('setting_password/success/', views.repassword_success, name="repassword_success"), 
 ]
 
 if settings.DEBUG:  

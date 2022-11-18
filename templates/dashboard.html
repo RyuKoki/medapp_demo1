@@ -9,15 +9,17 @@
                     {% for q in elders %}
                         <div class="col">
                             <div class="card text-center">
-                                <img src="{{q.image.url}}" class="card-img-top" alt="" width="400px" height="300px">
+                                <div class="card-img-top align-items-center bg-success" style="--bs-bg-opacity: .15;">
+                                    <img src="{{q.image.url}}" class="card-img-top" alt="" style="object-fit:scale-down; width:400px; height:300px;">
+                                </div>
                                 <div class="card-body">
                                     <div>
                                         <!-- <input class="card-title btn btn-lg w-100 form-control" type="submit" name="elder_name" value="{{q.first_name}} {{q.sure_name}}">
                                         <input class="form-control" type="hidden" name="elder_id" value="{{q.id}}, {{q.first_name}}"> -->
                                         <button type="submit" class="card-title btn w-100 fs-5" name="elder_id" value="{{q.id}}">{{q.first_name}} {{q.sure_name}}</button>
-                                        <p class="card-text">
-                                            <small class="text-muted">{{q.relative_phone}} (คุณ {{q.relative_firstname}})</small>
-                                        </p>
+                                        <!-- <p class="card-text">
+                                            <small class="text-muted">{{q.emergency.relative_phone}} (คุณ {{q.emergency.relative_firstname}})</small>
+                                        </p> -->
                                     </div>
                                 </div>
                             </div>

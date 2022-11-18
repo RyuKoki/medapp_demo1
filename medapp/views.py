@@ -1,10 +1,11 @@
 from pyexpat.errors import messages
 from django.shortcuts import redirect, render
 from django.http import HttpResponse
-from .models import Elder, Dispenser, ElderDisease, ElderPhysical, TakeCare
+from .models import Elder, ElderDisease, ElderPhysical, TakeCare, Emergency
 from django.contrib.auth.models import User, auth
 from django.contrib import messages
 import face_recognition
+from django.core.mail import EmailMessage
 # from httpx import options
 
 # Create your views here.
@@ -20,6 +21,7 @@ elder_info = {
     "care_surname": '', 
     "relation": '', 
     "care_phone": '', 
+    "IDN": '', 
 }
 disease_info = {
     "disease_else": '',
@@ -55,6 +57,7 @@ def home(request):
     elder_info["care_surname"] = ''
     elder_info["relation"] = ''
     elder_info["care_phone"] = ''
+    elder_info["IDN"] = ''
     disease_info["disease_else"] = ''
     disease_info["disease_name"] = []
     physical_info["physical_name"] = []
@@ -89,6 +92,7 @@ def view_elder_info(request):
         elder = Elder.objects.filter(id=e_id)[0]
         disease = ElderDisease.objects.filter(elder_id_id=e_id)[0]
         physical = ElderPhysical.objects.filter(elder_id_id=e_id)[0]
+        emergency = Emergency.objects.filter(elder_id_id=e_id)[0]
         # print(physical.physical['physical_name'])
         # print(type(physical.physical['physical_name']))
         if physical.physical['physical_name'] == []:
@@ -104,7 +108,8 @@ def view_elder_info(request):
                     {'elder_info': elder, 
                         'elder_disease': disease.disease['disease_name'], 
                         'elder_physical': phy_result, 
-                        'elder_memory': elder.memory['options']})
+                        'elder_memory': elder.memory['options'], 
+                        'emergency': emergency})
 
 def add_new(request):
     elder_info["name"] =''
@@ -117,6 +122,7 @@ def add_new(request):
     elder_info["care_surname"] = ''
     elder_info["relation"] = ''
     elder_info["care_phone"] = ''
+    elder_info["IDN"] = ''
     disease_info["disease_else"] = ''
     disease_info["disease_name"] = []
     physical_info["physical_name"] = []
@@ -137,6 +143,7 @@ def elder_register2(request):
         elder_info["care_surname"] = request.POST['care_surname']
         elder_info["relation"] = request.POST['relation']
         elder_info["care_phone"] = request.POST['care_phone']
+        elder_info["IDN"] = request.POST['elder_IDN']
         return render(request, 'elder_regis2.html',disease_info)
     elif "cancel" in request.POST :
         elder_info["name"] =''
@@ -149,6 +156,7 @@ def elder_register2(request):
         elder_info["care_surname"] = ''
         elder_info["relation"] = ''
         elder_info["care_phone"] = ''
+        elder_info['IDN'] = ''
         # return render(request, 'layout.html')
         return redirect('/')
     else:
@@ -179,7 +187,6 @@ def elder_register3(request):
     else:
         return render(request, 'elder_regis3.html',physical_info)
     
-
 def elder_register4(request):
     if "back3" in request.POST :
         return render(request, 'elder_regis3.html',physical_info)
@@ -197,7 +204,6 @@ def elder_register4(request):
         return redirect('/')
     else:
         return render(request, 'elder_regis4.html',mem)
-
 
 def elder_register5(request):
     if "back4" in request.POST :
@@ -224,16 +230,11 @@ def save_elder_info(request):
             elder_phy = ElderPhysical()
             elder_disease = ElderDisease()
             take_care = TakeCare()
+            emergency = Emergency()
             new_elder.first_name = elder_info['name']
             new_elder.sure_name = elder_info['surname']
             new_elder.birthday = elder_info['birthday']
-            new_elder.hospital_number = elder_info['HN']
-            new_elder.hospital_name = elder_info['hospital_name']
-            new_elder.hospital_phone = elder_info['hospital_phone']
-            new_elder.relative_firstname = elder_info['care_name']
-            new_elder.relative_surename = elder_info['care_surname']
-            new_elder.relative_relation = elder_info['relation']
-            new_elder.relative_phone = elder_info['care_phone']
+            new_elder.IDN = elder_info['IDN']
             # new_elder.disease = disease_info['disease_name']
             new_elder.memory = mem
             # new_elder.face = img_data['crop_arr']
@@ -245,6 +246,16 @@ def save_elder_info(request):
             test["face"] = changetype
             new_elder.face = test["face"]
             new_elder.save()
+            # elder's emergency
+            emergency.elder_id_id = new_elder.id
+            emergency.hospital_number = elder_info['HN']
+            emergency.hospital_name = elder_info['hospital_name']
+            emergency.hospital_phone = elder_info['hospital_phone']
+            emergency.relative_firstname = elder_info['care_name']
+            emergency.relative_surename = elder_info['care_surname']
+            emergency.relative_relation = elder_info['relation']
+            emergency.relative_phone = elder_info['care_phone']
+            emergency.save()
             # elder's disease
             elder_disease.elder_id_id = new_elder.id
             elder_disease.disease = disease_info
@@ -258,7 +269,38 @@ def save_elder_info(request):
             take_care.time_spend = None
             take_care.elder_id_id = new_elder.id
             take_care.save()
-            # return render(request, 'layout.html')\
+            # EMAIL for insert ELDER
+            email_care = User.objects.filter(id=care_taker)[0]
+            subject = "[เสร็จสิ้น] เพิ่มข้อมูลผู้สูงอายุ 👵🧓"
+            body = '''
+                <p>สวัสดี, คุณ {}</p>
+                <p><strong>คุณได้ทำการเพิ่มข้อมูลผู้สูงอายุในความดูแล</strong> โดยมีรายละเอียดดังนี้</p>
+                <p><strong></strong> </p>
+                <p><strong>รหัสประจำตัวประชาชน : </strong>{}</p>
+                <div class="row">
+                    <div class="column"><p><strong>ชื่อ : </strong>{}</p></div>
+                    <div class="column"><p><strong>นามสกุล : </strong>{}</p></div>
+                </div>
+                <div class="row">
+                    <div class="column"><p><strong>วัน/เดือน/ปีเกิด : </strong>{}</p></div>
+                    <div class="column"><p><strong>เลขประจำตัวบัตรโรงพยาบาล : </strong>{}</p></div>
+                </div>
+                <div class="row">
+                    <div class="column"><p><strong>โรงพยาบาลที่รักษา : </strong>{}</p></div>
+                    <div class="column"><p><strong>เบอร์โทรโรงพยาบาล : </strong>{}</p></div>
+                </div>
+                <p><strong>โรคประจำตัว : </strong>{}</p>
+                <p><strong>ปัญหาสภาพทางร่างกาย : </strong>{}</p>
+                <p><strong>ความทรงจำ : </strong>{}</p>
+                <p style="color: red"><strong>ระบบได้ทำการบันทึกข้อมูลเสร็จสิ้นแล้ว</strong></p>
+            '''.format(email_care.first_name, elder_info['IDN'], 
+                            elder_info['name'], elder_info['surname'], 
+                            elder_info['birthday'], elder_info['HN'], 
+                            elder_info['hospital_name'], elder_info['hospital_phone'], 
+                            disease_info['disease_name'], physical_info['physical_name'], mem['options'])
+            email = EmailMessage(subject=subject, body=body, to=[email_care.email])
+            email.content_subtype = 'html'
+            email.send()
         return redirect('/')
     elif "cancel5" in request.POST :
         print("cancel")
@@ -279,7 +321,14 @@ def login(request):
     user = auth.authenticate(username=logging_in['username'], password=logging_in['password'])
     if user is not None:
         auth.login(request, user)
-        # return render(request, 'layout.html')
+        # # return render(request, 'layout.html')
+        # subject = "Test"
+        # body = '''
+        #     <p>This is a test email message.</p>
+        # '''
+        # email = EmailMessage(subject=subject, body=body, to=['suphinya156165@gmail.com'])
+        # email.content_subtype = 'html'
+        # email.send()
         return redirect('/')
     else:
         messages.info(request, 'ไม่พบข้อมูล')
@@ -336,15 +385,31 @@ def elder_register5(request):
     else:
         return render(request, 'elder_regis5.html',img_data)
 
-# def save_elder_info(request):
-#     if "back5" in request.POST :
-#         return render(request, 'elder_regis4.html',mem)
-#     elif "next5" in request.POST :
-#         img_data['crop_arr'] = request.POST['dataurl']
-#         print(len(img_data['crop_arr']))
-#         return render(request, 'layout.html',img_data)
-#     elif "cancel5" in request.POST :
-#         img_data['crop_arr'] = []
-#         return render(request, 'layout.html')
-#     else:
-#         return render(request, 'layout.html',img_data)
+def forget_password(request):
+    return render(request, 'reset_password.html')
+
+def send_reset_pwd(request):
+    email_name = request.POST['email_addr']
+    subject = "ตั้งค่ารหัสผ่านใหม่ 👩🏻‍🔧"
+    body = '''
+        <p>คุณสามารถกดลิ้งค์นี้เพื่อทำการเปลี่ยนรหัสผ่าน</p>
+        <a href="http://127.0.0.1:8000/setting_password/">http://127.0.0.1:8000/setting_password/</a>
+        <p style="color: red">หากคุณไม่ได้ขอเปลี่ยนรหัสผ่านใหม่ <strong>กรุณาอย่าดำเนินการใดๆ ทั้งสิ้น</strong></p>
+    '''
+    email = EmailMessage(subject=subject, body=body, to=[email_name])
+    email.content_subtype = 'html'
+    email.send()
+    messages.info(request, "ระบบได้ทำการส่งลิ้งค์สำหรับเปลี่ยนรหัสผ่านให้คุณทางอีเมลแล้ว กรุณาตรวจสอบที่กล่องข้อความของคุณ")
+    return redirect('/')
+
+def new_password(request):
+    return render(request, 'new_password.html')
+
+def repassword_success(request):
+    email_name = request.POST['email_addr']
+    user = User.objects.filter(username=email_name)[0]
+    user.set_password(request.POST['new_pwd'])
+    user.save()
+    messages.info(request, "เปลี่ยนรหัสผ่านเสร็จสิ้นแล้ว")
+    return redirect('/')
+    # return render(request, 'login.html')
